@@ -19,6 +19,9 @@ import { useEffect } from 'react';
 import { AppDispatch, useDispatch } from '../../services/store';
 import { getUser } from '../../services/slices/userSlice';
 
+// Импортируем getIngredient
+import { getIngredient } from '../../services/slices/ingredientsSlice';
+
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,7 +30,9 @@ const App = () => {
 
   useEffect(() => {
     dispatch(getUser());
-  }, []);
+    dispatch(getIngredient()); // Добавляем здесь загрузку ингредиентов один раз
+  }, [dispatch]);
+
   function handleModalClose() {
     navigate(-1);
   }

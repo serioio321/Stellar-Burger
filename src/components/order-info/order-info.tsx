@@ -6,12 +6,10 @@ import { useDispatch, useSelector } from '../../services/store';
 import { AppDispatch, RootState } from '../../services/store';
 import { getOrder } from '../../services/slices/orderSlice';
 import { useParams } from 'react-router-dom';
-import { getIngredient } from '../../services/slices/ingredientsSlice';
 
 export const OrderInfo: FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { number } = useParams();
-  /** TODO: взять переменные orderData и ingredients из стора */
 
   const { isLoading: isIngredientsLoading, data: ingredients } = useSelector(
     (state: RootState) => state.ingredientsReducer
@@ -20,12 +18,13 @@ export const OrderInfo: FC = () => {
   const { isOrderLoading, orderModalData: orderData } = useSelector(
     (state: RootState) => state.orderReducer
   );
-  useEffect(() => {
-    dispatch(getOrder(Number(number)));
-    dispatch(getIngredient());
-  }, [dispatch]);
 
-  /* Готовим данные для отображения */
+  useEffect(() => {
+    if (number) {
+      dispatch(getOrder(Number(number)));
+    }
+  }, [dispatch, number]);
+
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
@@ -48,7 +47,6 @@ export const OrderInfo: FC = () => {
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
@@ -66,6 +64,7 @@ export const OrderInfo: FC = () => {
       total
     };
   }, [orderData, ingredients]);
+
   if (isIngredientsLoading || isOrderLoading) {
     return <Preloader />;
   }

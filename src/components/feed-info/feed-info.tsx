@@ -12,16 +12,21 @@ const getOrders = (orders: TOrder[], status: string): number[] =>
     .slice(0, 20);
 
 export const FeedInfo: FC = () => {
-  /** TODO: взять переменные из стора */
   const dataFeeds = useSelector((state: RootState) => state.feedsReducer);
+
+  // Если данные ещё не загружены
+  if (!dataFeeds.data || !dataFeeds.data.orders) {
+    return null; // или <p>Загрузка...</p>
+  }
+
   const orders: TOrder[] = dataFeeds.data.orders;
+
   const feed = {
-    total: dataFeeds.data.total,
-    totalToday: dataFeeds.data.totalToday
+    total: Number(dataFeeds.data.total) || 0,
+    totalToday: Number(dataFeeds.data.totalToday) || 0
   };
 
   const readyOrders = getOrders(orders, 'done');
-
   const pendingOrders = getOrders(orders, 'pending');
 
   return (
