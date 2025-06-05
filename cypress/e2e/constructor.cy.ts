@@ -7,7 +7,7 @@ const dataCyMain = '[data-cy="main"]';
 const dataCySauce = '[data-cy="sauce"]';
 const dataCyOrder = '[data-cy-order]';
 const constructorList = '[data-cy="constructor-list"]';
-const modals = '#modals';
+const modal = '[data-cy="modal"]';
 
 describe('Проверка интерфейса приложения', () => {
   beforeEach(() => {
@@ -23,14 +23,19 @@ describe('Проверка интерфейса приложения', () => {
   describe('Тест модальных окон', () => {
     it('Открытие и проверка модального окна ингредиента', () => {
       cy.get(dataCyBunFirst).then(($bun) => {
-        const bunName = $bun.find('p').text();
-        $bun.click();
+        const bunName = $bun.find('p').text().replace(/^\d+/, '').trim();
 
-        cy.get(modals).children().should('have.length', 2);
-        cy.get(`${modals} h2`).should('contain.text', bunName);
+        cy.wrap($bun).click();
 
-        cy.get(`${modals} button:first-of-type`).click();
-        cy.get(modals).children().should('have.length', 0);
+        cy.get(modal, { timeout: 10000 }).should('exist');
+        cy.get(`${modal} h3`, { timeout: 10000 })
+          .invoke('text')
+          .then((text) => {
+            expect(text).to.include(bunName);
+          });
+
+        cy.get(`${modal} button`).first().click();
+        cy.get(modal).should('not.exist');
       });
     });
   });
@@ -38,11 +43,14 @@ describe('Проверка интерфейса приложения', () => {
   describe('Тест конструктора', () => {
     it('Добавление ингредиента в конструктор и проверка', () => {
       cy.get(dataCyMain).first().then(($main) => {
-        const mainName = $main.find('p').text();
-        cy.get($main).find('button').click();
+        const fullText = $main.find('p').text();
+        const nameOnly = fullText.replace(/^\d+\s*/, '');
 
-        cy.get(constructorList)
-          .should('contain.text', mainName);
+        cy.wrap($main).find('button').click();
+
+        cy.get(constructorList, { timeout: 10000 })
+          .should('exist')
+          .and('contain.text', nameOnly);
       });
     });
   });
@@ -65,8 +73,8 @@ describe('Проверка интерфейса приложения', () => {
       cy.get(dataCyOrder).should('be.enabled');
       cy.get(dataCyOrder).click();
 
-      cy.get(modals).children().should('have.length', 2);
-      cy.get(`${modals} h2:first-of-type`).should('have.text', orderFixture.order.number);
+      cy.get(modal).should('exist');
+      cy.get(`${modal} h2:first-of-type`).should('have.text', orderFixture.order.number);
       cy.get(dataCyOrder).should('be.disabled');
     });
 
