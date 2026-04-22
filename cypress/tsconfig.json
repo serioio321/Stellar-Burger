@@ -1,0 +1,13 @@
+{
+  /* Расширяем основной конфиг проекта */
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    /* Используем только типы Cypress, чтобы избежать конфликтов, например, с Jest */
+    "types": ["cypress"]
+  },
+  "include": [
+    "../node_modules/cypress",
+    "./**/*.ts"
+  ]
+}
